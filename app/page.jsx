@@ -49,27 +49,6 @@ export default function HomePage() {
     [],
   );
 
-  const quickStats = useMemo(() => {
-    const totalTurfs = mockTurfs.length;
-    const avgPrice =
-      totalTurfs > 0
-        ? Math.round(
-            mockTurfs.reduce((sum, turf) => sum + turf.pricePerHour, 0) /
-              totalTurfs,
-          )
-        : 0;
-    const highestRated = mockTurfs.reduce(
-      (best, turf) => (turf.rating > best.rating ? turf : best),
-      mockTurfs[0],
-    );
-
-    return {
-      totalTurfs,
-      avgPrice,
-      topRatedName: highestRated?.name ?? "N/A",
-    };
-  }, []);
-
   const featuredTurfs = useMemo(
     () => [...mockTurfs].sort((a, b) => b.rating - a.rating).slice(0, 3),
     [],
@@ -82,21 +61,21 @@ export default function HomePage() {
           <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white blur-3xl" />
           <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-yellow-200 blur-3xl" />
         </div>
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl text-center">
             <p className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-green-50">
               <Sparkles className="h-3.5 w-3.5" /> Smart Turf Discovery
             </p>
-            <h1 className="text-4xl font-bold md:text-5xl">
+            <h1 className="text-3xl font-bold md:text-4xl">
               Book your perfect turf
             </h1>
-            <p className="mt-4 text-lg text-green-100">
+            <p className="mt-3 text-base text-green-100">
               Discover top venues, compare prices instantly, and reserve the
               best slot for your team.
             </p>
           </div>
 
-          <div className="mx-auto mt-8 flex max-w-5xl flex-col gap-3 rounded-2xl bg-white p-3 shadow-2xl md:flex-row">
+          <div className="mx-auto mt-5 flex max-w-5xl flex-col gap-3 rounded-2xl bg-white p-3 shadow-2xl md:flex-row">
             <div className="flex flex-1 items-center gap-2 px-3">
               <Search className="h-5 w-5 text-gray-400" />
               <input
@@ -139,23 +118,6 @@ export default function HomePage() {
             >
               Explore Venues <ArrowRight className="h-4 w-4" />
             </Link>
-          </div>
-
-          <div className="mx-auto mt-6 grid max-w-5xl grid-cols-1 gap-3 md:grid-cols-3">
-            <div className="rounded-xl bg-white/15 p-4 backdrop-blur-sm">
-              <p className="text-xs text-green-100">Trending Area</p>
-              <p className="mt-1 text-sm font-semibold">Mumbai Football</p>
-            </div>
-            <div className="rounded-xl bg-white/15 p-4 backdrop-blur-sm">
-              <p className="text-xs text-green-100">Peak Hours</p>
-              <p className="mt-1 text-sm font-semibold">6 PM - 10 PM</p>
-            </div>
-            <div className="rounded-xl bg-white/15 p-4 backdrop-blur-sm">
-              <p className="text-xs text-green-100">Top Rated Turf</p>
-              <p className="mt-1 text-sm font-semibold">
-                {quickStats.topRatedName}
-              </p>
-            </div>
           </div>
         </div>
       </section>

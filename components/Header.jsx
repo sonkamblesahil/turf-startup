@@ -64,7 +64,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-emerald-100/80 bg-white/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-emerald-100/80 bg-white/90 backdrop-blur-md transition-colors">
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href={role === "owner" ? "/owner-dashboard" : "/"}
@@ -85,7 +85,7 @@ export default function Header() {
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-2 rounded-2xl border border-gray-200 bg-white px-2 py-1.5 shadow-sm md:flex">
+        <nav className="hidden items-center gap-2 rounded-2xl border border-gray-200 bg-white px-2 py-1.5 shadow-sm transition-colors md:flex">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active =

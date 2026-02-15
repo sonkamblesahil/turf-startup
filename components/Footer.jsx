@@ -41,7 +41,7 @@ export default function Footer() {
     role === "owner" ? ownerLinks : role === "user" ? userLinks : [];
 
   return (
-    <footer className="mt-8 border-t border-gray-200 bg-white">
+    <footer className="mt-8 border-t border-gray-200 bg-white transition-colors">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           <div>
