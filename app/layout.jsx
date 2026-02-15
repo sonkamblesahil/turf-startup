@@ -14,9 +14,9 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body>
         <Providers>
-          <div className="min-h-screen bg-white text-gray-900 dark:bg-zinc-950 dark:text-zinc-100">
+          <div className="flex min-h-screen flex-col bg-white text-gray-900 dark:bg-zinc-950 dark:text-zinc-100">
             <Header />
-            <main>{children}</main>
+            <main className="flex-1">{children}</main>
             <Footer />
           </div>
         </Providers>

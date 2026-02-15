@@ -60,7 +60,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/45 to-black/65 dark:from-black/85 dark:via-black/65 dark:to-black/80" />
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-black/15 dark:from-black/70 dark:to-black/20" />
         <div className="relative mx-auto max-w-7xl px-4 pb-6 pt-[25vh] sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl text-center">
+          <div className="max-w-4xl text-left">
             <h1 className="text-3xl font-bold md:text-4xl">
               Book your perfect turf
             </h1>
@@ -70,7 +70,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mx-auto mt-4 flex max-w-3xl flex-col gap-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-xl dark:border-zinc-700/80 dark:bg-zinc-900/95 md:flex-row md:items-center">
+          <div className="mt-4 flex max-w-3xl flex-col gap-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-xl dark:border-zinc-700/80 dark:bg-zinc-900/95 md:flex-row md:items-center">
             <div className="flex flex-1 items-center gap-2 px-2">
               <Search className="h-4 w-4 text-gray-400 dark:text-zinc-500" />
               <input
