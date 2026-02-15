@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import {
   Calendar,
   CreditCard,
@@ -15,8 +18,24 @@ import {
 } from "@/lib/mockData";
 
 export default function OwnerDashboardPage() {
+  const [registration, setRegistration] = useState({
+    name: "",
+    location: "",
+    size: "",
+    ownerContact: "",
+    timing: "",
+    refundAllowed: "yes",
+    details: "",
+  });
+  const [createdTurfs, setCreatedTurfs] = useState([]);
+  const [formMessage, setFormMessage] = useState("");
+
   const owner = mockUsers.find((user) => user.role === "owner");
   const ownerTurfs = mockTurfs.filter((turf) => turf.ownerId === owner?.id);
+  const allOwnerTurfs = useMemo(
+    () => [...ownerTurfs, ...createdTurfs],
+    [createdTurfs, ownerTurfs],
+  );
   const ownerBookings = mockBookings.filter((booking) =>
     ownerTurfs.some((turf) => turf.id === booking.turfId),
   );
@@ -55,6 +74,52 @@ export default function OwnerDashboardPage() {
   const estimatedPayout =
     totalRevenue + ownerBidCommissions - monthlyPlatformFee;
 
+  const onRegistrationChange = (field, value) => {
+    setRegistration((prev) => ({ ...prev, [field]: value }));
+    setFormMessage("");
+  };
+
+  const handleTurfRegistration = (event) => {
+    event.preventDefault();
+
+    const requiredFields = [
+      registration.name,
+      registration.location,
+      registration.size,
+      registration.ownerContact,
+      registration.timing,
+      registration.details,
+    ];
+
+    if (requiredFields.some((value) => !value.trim())) {
+      setFormMessage("Please fill all required turf registration fields.");
+      return;
+    }
+
+    const newTurf = {
+      id: `custom-${Date.now()}`,
+      name: registration.name.trim(),
+      location: registration.location.trim(),
+      size: registration.size.trim(),
+      details: registration.details.trim(),
+      timing: registration.timing.trim(),
+      ownerContactNumber: registration.ownerContact.trim(),
+      refundAllowed: registration.refundAllowed === "yes",
+    };
+
+    setCreatedTurfs((prev) => [newTurf, ...prev]);
+    setRegistration({
+      name: "",
+      location: "",
+      size: "",
+      ownerContact: "",
+      timing: "",
+      refundAllowed: "yes",
+      details: "",
+    });
+    setFormMessage("Turf registered successfully in this demo session.");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -82,7 +147,7 @@ export default function OwnerDashboardPage() {
             <Trophy className="mb-3 h-6 w-6 text-yellow-600" />
             <p className="text-sm text-gray-500">Listed Turfs</p>
             <p className="text-2xl font-bold text-gray-900">
-              {ownerTurfs.length}
+              {allOwnerTurfs.length}
             </p>
           </div>
           <div className="rounded-xl bg-white p-6 shadow">
@@ -154,7 +219,10 @@ export default function OwnerDashboardPage() {
           </div>
         </div>
 
-        <div className="mb-8 rounded-xl bg-white p-6 shadow">
+        <form
+          onSubmit={handleTurfRegistration}
+          className="mb-8 rounded-xl bg-white p-6 shadow"
+        >
           <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold text-gray-900">
             <ListChecks className="h-5 w-5 text-green-600" /> Turf Registration
             (Owner)
@@ -163,37 +231,99 @@ export default function OwnerDashboardPage() {
             <input
               className="rounded-lg border border-gray-300 px-3 py-2"
               placeholder="Turf name"
+              value={registration.name}
+              onChange={(event) =>
+                onRegistrationChange("name", event.target.value)
+              }
             />
             <input
               className="rounded-lg border border-gray-300 px-3 py-2"
               placeholder="Location"
+              value={registration.location}
+              onChange={(event) =>
+                onRegistrationChange("location", event.target.value)
+              }
             />
             <input
               className="rounded-lg border border-gray-300 px-3 py-2"
               placeholder="Size of turf"
+              value={registration.size}
+              onChange={(event) =>
+                onRegistrationChange("size", event.target.value)
+              }
             />
             <input
               className="rounded-lg border border-gray-300 px-3 py-2"
               placeholder="Owner contact number"
+              value={registration.ownerContact}
+              onChange={(event) =>
+                onRegistrationChange("ownerContact", event.target.value)
+              }
             />
             <input
               className="rounded-lg border border-gray-300 px-3 py-2"
               placeholder="Available timing (e.g., 06:00-20:00)"
+              value={registration.timing}
+              onChange={(event) =>
+                onRegistrationChange("timing", event.target.value)
+              }
             />
-            <select className="rounded-lg border border-gray-300 px-3 py-2">
-              <option>Refund allowed</option>
-              <option>Refund not allowed</option>
+            <select
+              className="rounded-lg border border-gray-300 px-3 py-2"
+              value={registration.refundAllowed}
+              onChange={(event) =>
+                onRegistrationChange("refundAllowed", event.target.value)
+              }
+            >
+              <option value="yes">Refund allowed</option>
+              <option value="no">Refund not allowed</option>
             </select>
             <textarea
               className="rounded-lg border border-gray-300 px-3 py-2 md:col-span-2"
               rows={3}
               placeholder="Turf details, amenities, tournament availability"
+              value={registration.details}
+              onChange={(event) =>
+                onRegistrationChange("details", event.target.value)
+              }
             />
           </div>
-          <button className="mt-4 rounded-lg bg-green-600 px-5 py-2.5 font-semibold text-white hover:bg-green-700">
-            Save Turf Registration (Demo)
+          {formMessage && (
+            <p className="mt-3 text-sm font-medium text-green-700">
+              {formMessage}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="mt-4 rounded-lg bg-green-600 px-5 py-2.5 font-semibold text-white hover:bg-green-700"
+          >
+            Save Turf Registration
           </button>
-        </div>
+        </form>
+
+        {createdTurfs.length > 0 && (
+          <div className="mb-8 rounded-xl bg-white p-6 shadow">
+            <h2 className="mb-4 text-xl font-semibold text-gray-900">
+              Newly Registered Turfs
+            </h2>
+            <div className="space-y-3">
+              {createdTurfs.map((turf) => (
+                <div
+                  key={turf.id}
+                  className="rounded-lg border border-gray-200 p-4 text-sm text-gray-700"
+                >
+                  <p className="font-semibold text-gray-900">{turf.name}</p>
+                  <p>{turf.location}</p>
+                  <p>Size: {turf.size}</p>
+                  <p>Timing: {turf.timing}</p>
+                  <p>
+                    Refund: {turf.refundAllowed ? "Allowed" : "Not allowed"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="rounded-xl bg-white p-6 shadow">
           <h2 className="mb-4 text-xl font-semibold text-gray-900">

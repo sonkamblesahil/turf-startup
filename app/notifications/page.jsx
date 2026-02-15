@@ -6,7 +6,9 @@ import { mockNotifications } from "@/lib/mockData";
 
 export default function NotificationsPage() {
   const [filter, setFilter] = useState("all");
-  const notifications = mockNotifications;
+  const [notifications, setNotifications] = useState(mockNotifications);
+
+  const unreadCount = notifications.filter((item) => !item.read).length;
 
   const filtered = useMemo(() => {
     if (filter === "all") return notifications;
@@ -26,12 +28,35 @@ export default function NotificationsPage() {
     return <Bell className="h-5 w-5 text-gray-500" />;
   };
 
+  const markAsRead = (id) => {
+    setNotifications((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, read: true } : item)),
+    );
+  };
+
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6 flex items-center gap-3">
           <Bell className="h-8 w-8 text-green-600" />
-          <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
+            <p className="text-sm text-gray-600">Unread: {unreadCount}</p>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={markAllAsRead}
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Mark all as read
+          </button>
         </div>
 
         <div className="mb-6 flex flex-wrap gap-2">
@@ -56,11 +81,13 @@ export default function NotificationsPage() {
           {filtered.map((notification) => (
             <div
               key={notification.id}
-              className="rounded-xl bg-white p-4 shadow"
+              className={`rounded-xl p-4 shadow ${
+                notification.read ? "bg-white" : "bg-green-50"
+              }`}
             >
               <div className="flex gap-3">
                 <div className="mt-0.5">{getIcon(notification.type)}</div>
-                <div>
+                <div className="flex-1">
                   <h2 className="font-semibold text-gray-900">
                     {notification.title}
                   </h2>
@@ -70,6 +97,16 @@ export default function NotificationsPage() {
                   <p className="mt-1 text-xs text-gray-500">
                     {notification.createdAt}
                   </p>
+
+                  {!notification.read && (
+                    <button
+                      type="button"
+                      onClick={() => markAsRead(notification.id)}
+                      className="mt-2 rounded border border-green-600 px-2.5 py-1 text-xs font-medium text-green-700 hover:bg-green-100"
+                    >
+                      Mark as read
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

@@ -21,6 +21,7 @@ import {
 export default function BookingPage() {
   const params = useParams();
   const turf = mockTurfs.find((item) => item.id === params.turfId);
+  const [allBookings, setAllBookings] = useState(mockBookings);
 
   const [selectedDate, setSelectedDate] = useState("2026-02-20");
   const [selectedSlot, setSelectedSlot] = useState("");
@@ -30,16 +31,17 @@ export default function BookingPage() {
   const [balls, setBalls] = useState(0);
   const [useMatchmaking, setUseMatchmaking] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("upi");
+  const [bookingMessage, setBookingMessage] = useState("");
 
   const userId = "user1";
   const today = "2026-02-15";
 
   const userBookings = useMemo(
     () =>
-      mockBookings.filter(
+      allBookings.filter(
         (booking) => booking.userId === userId && booking.turfId === turf?.id,
       ),
-    [turf],
+    [allBookings, turf],
   );
 
   const upcoming = userBookings.filter((booking) => booking.date >= today);
@@ -55,9 +57,23 @@ export default function BookingPage() {
           booked.startTime === startTime &&
           booked.endTime === endTime,
       );
-      return { slot, startTime, endTime, isBooked };
+
+      const isBookedInSession = allBookings.some(
+        (booking) =>
+          booking.turfId === turf.id &&
+          booking.date === selectedDate &&
+          booking.startTime === startTime &&
+          booking.endTime === endTime,
+      );
+
+      return {
+        slot,
+        startTime,
+        endTime,
+        isBooked: isBooked || isBookedInSession,
+      };
     });
-  }, [selectedDate, turf]);
+  }, [allBookings, selectedDate, turf]);
 
   const bidOptions = useMemo(() => {
     if (!turf) return [];
@@ -90,6 +106,61 @@ export default function BookingPage() {
       total: base + equipmentCharge + platformFee,
     };
   }, [balls, bats, selectedSlot, turf]);
+
+  const handleConfirmBooking = () => {
+    if (!selectedSlot) {
+      setBookingMessage("Please select an available slot before payment.");
+      return;
+    }
+
+    if (numberOfPeople < 1) {
+      setBookingMessage("Number of people must be at least 1.");
+      return;
+    }
+
+    if (!amountBreakdown) {
+      setBookingMessage("Price details are missing. Please try again.");
+      return;
+    }
+
+    const [startTime, endTime] = selectedSlot.split("-");
+
+    const alreadyExists = allBookings.some(
+      (booking) =>
+        booking.turfId === turf.id &&
+        booking.date === selectedDate &&
+        booking.startTime === startTime &&
+        booking.endTime === endTime,
+    );
+
+    if (alreadyExists) {
+      setBookingMessage(
+        "This slot is already booked. Please choose another slot.",
+      );
+      return;
+    }
+
+    const newBooking = {
+      id: `booking-${Date.now()}`,
+      turfId: turf.id,
+      userId,
+      date: selectedDate,
+      startTime,
+      endTime,
+      type: bookingType,
+      numberOfPeople,
+      equipment: { bats, balls },
+      totalAmount: amountBreakdown.total,
+      status: "confirmed",
+      createdAt: new Date().toISOString(),
+    };
+
+    setAllBookings((prev) => [newBooking, ...prev]);
+    setSelectedSlot("");
+    setBookingMessage(
+      `Booking confirmed for ${selectedDate} ${startTime}-${endTime} via ${paymentMethod.toUpperCase()}.`,
+    );
+  };
 
   if (!turf) {
     return (
@@ -262,8 +333,18 @@ export default function BookingPage() {
                 </div>
               </div>
 
-              <button className="mt-5 rounded-lg bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700">
-                Confirm & Pay with {paymentMethod.toUpperCase()} (Demo)
+              {bookingMessage && (
+                <p className="mt-3 text-sm font-medium text-green-700">
+                  {bookingMessage}
+                </p>
+              )}
+
+              <button
+                type="button"
+                onClick={handleConfirmBooking}
+                className="mt-5 rounded-lg bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700"
+              >
+                Confirm & Pay with {paymentMethod.toUpperCase()}
               </button>
             </div>
 
