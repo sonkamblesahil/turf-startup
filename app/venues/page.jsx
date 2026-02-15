@@ -63,8 +63,8 @@ export default function VenuesLandingPage() {
                   className="h-44 w-full object-cover transition duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/25 to-transparent" />
-                <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-lg bg-white/90 px-3 py-1.5 text-sm font-semibold capitalize text-gray-900">
-                  <MapPin className="h-4 w-4 text-green-600" /> {city}
+                <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-lg bg-zinc-100/95 px-3 py-1.5 text-sm font-semibold capitalize text-zinc-900">
+                  <MapPin className="h-4 w-4 text-emerald-700" /> {city}
                 </div>
               </Link>
             ))}
@@ -88,8 +88,8 @@ export default function VenuesLandingPage() {
                   className="h-44 w-full object-cover transition duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/25 to-transparent" />
-                <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-lg bg-white/90 px-3 py-1.5 text-sm font-semibold capitalize text-gray-900">
-                  <Target className="h-4 w-4 text-green-600" />
+                <div className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-lg bg-zinc-100/95 px-3 py-1.5 text-sm font-semibold capitalize text-zinc-900">
+                  <Target className="h-4 w-4 text-emerald-700" />
                   {sport.replace("-", " ")}
                 </div>
               </Link>
