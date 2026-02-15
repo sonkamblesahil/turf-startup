@@ -1,13 +1,94 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Calendar, Mail, MapPin, Phone, Star, Users } from "lucide-react";
-import { mockReviews, mockTurfs } from "@/lib/mockData";
+import { mockReviews, mockTurfs, mockUsers } from "@/lib/mockData";
 
 export default function TurfDetailsPage() {
   const params = useParams();
-  const turf = mockTurfs.find((item) => item.id === params.id);
+  const turfId = typeof params.id === "string" ? params.id : params.id?.[0];
+  const turf = mockTurfs.find((item) => item.id === turfId);
+  const [currentUser, setCurrentUser] = useState(
+    mockUsers.find((user) => user.role === "user"),
+  );
+  const [reviews, setReviews] = useState(() =>
+    mockReviews.filter((review) => review.turfId === turfId),
+  );
+  const [rating, setRating] = useState("5");
+  const [comment, setComment] = useState("");
+  const [reviewMessage, setReviewMessage] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const currentUserRaw = localStorage.getItem("currentUser");
+    if (!currentUserRaw) return;
+
+    try {
+      const parsedUser = JSON.parse(currentUserRaw);
+      if (parsedUser?.role === "user") {
+        setCurrentUser(parsedUser);
+      }
+    } catch {
+      setCurrentUser(mockUsers.find((user) => user.role === "user"));
+    }
+  }, []);
+
+  useEffect(() => {
+    setReviews(mockReviews.filter((review) => review.turfId === turfId));
+  }, [turfId]);
+
+  const handleAddReview = (event) => {
+    event.preventDefault();
+    const trimmedComment = comment.trim();
+    const numericRating = Number(rating);
+
+    if (!trimmedComment) {
+      setReviewMessage("Please write a review comment.");
+      return;
+    }
+
+    if (
+      !Number.isFinite(numericRating) ||
+      numericRating < 1 ||
+      numericRating > 5
+    ) {
+      setReviewMessage("Please choose a valid rating from 1 to 5.");
+      return;
+    }
+
+    const userId = currentUser?.id || "user1";
+    const userName = currentUser?.name || "User";
+
+    setReviews((prev) => {
+      const existingIndex = prev.findIndex(
+        (review) => review.userId === userId,
+      );
+      const updatedReview = {
+        id:
+          existingIndex >= 0 ? prev[existingIndex].id : `review-${Date.now()}`,
+        turfId: turf?.id,
+        userId,
+        userName,
+        rating: numericRating,
+        comment: trimmedComment,
+        createdAt: new Date().toISOString(),
+      };
+
+      if (existingIndex >= 0) {
+        const next = [...prev];
+        next[existingIndex] = updatedReview;
+        return next;
+      }
+
+      return [updatedReview, ...prev];
+    });
+
+    setComment("");
+    setRating("5");
+    setReviewMessage("Your review has been submitted.");
+  };
 
   if (!turf) {
     return (
@@ -16,8 +97,6 @@ export default function TurfDetailsPage() {
       </div>
     );
   }
-
-  const reviews = mockReviews.filter((review) => review.turfId === turf.id);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -58,11 +137,70 @@ export default function TurfDetailsPage() {
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-6 shadow">
+            <div
+              id="add-review"
+              className="rounded-xl bg-white p-6 shadow scroll-mt-24"
+            >
               <h2 className="mb-4 text-xl font-semibold text-gray-900">
                 Reviews
               </h2>
+              <form
+                onSubmit={handleAddReview}
+                className="mb-5 rounded-lg border border-gray-200 bg-gray-50 p-4"
+              >
+                <p className="mb-2 text-sm font-semibold text-gray-900">
+                  Add your review
+                </p>
+                <p className="mb-3 text-xs text-gray-600">
+                  Posting as {currentUser?.name || "User"}
+                </p>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+                  <select
+                    value={rating}
+                    onChange={(event) => {
+                      setRating(event.target.value);
+                      setReviewMessage("");
+                    }}
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm"
+                  >
+                    <option value="5">5 - Excellent</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="3">3 - Good</option>
+                    <option value="2">2 - Fair</option>
+                    <option value="1">1 - Poor</option>
+                  </select>
+                  <textarea
+                    rows={2}
+                    value={comment}
+                    onChange={(event) => {
+                      setComment(event.target.value);
+                      setReviewMessage("");
+                    }}
+                    placeholder="Write your experience"
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm md:col-span-3"
+                  />
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                  >
+                    Submit Review
+                  </button>
+                  {reviewMessage && (
+                    <p className="text-sm font-medium text-green-700">
+                      {reviewMessage}
+                    </p>
+                  )}
+                </div>
+              </form>
+
               <div className="space-y-4">
+                {reviews.length === 0 && (
+                  <p className="text-sm text-gray-600">
+                    No reviews yet. Be the first to add one.
+                  </p>
+                )}
                 {reviews.map((review) => (
                   <div
                     key={review.id}
@@ -105,6 +243,12 @@ export default function TurfDetailsPage() {
               >
                 Book Now
               </Link>
+              <a
+                href="#add-review"
+                className="mt-3 block rounded-lg border border-green-600 py-2 text-center text-sm font-semibold text-green-700 hover:bg-green-50"
+              >
+                Add Review
+              </a>
             </div>
 
             <div className="rounded-xl bg-white p-6 shadow">

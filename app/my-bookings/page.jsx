@@ -131,6 +131,15 @@ export default function MyBookingsPage() {
                   >
                     View Turf
                   </Link>
+
+                  {(booking.status === "completed" || booking.date < today) && (
+                    <Link
+                      href={`/turf/${booking.turfId}#add-review`}
+                      className="mt-4 ml-2 inline-block rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                    >
+                      Add Review
+                    </Link>
+                  )}
                 </div>
               );
             })}
@@ -160,6 +169,14 @@ export default function MyBookingsPage() {
                     {booking.date} | {booking.startTime} - {booking.endTime} |
                     Rs. {booking.totalAmount}
                   </p>
+                  <div className="mt-3">
+                    <Link
+                      href={`/turf/${booking.turfId}#add-review`}
+                      className="inline-block rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                    >
+                      Add Review
+                    </Link>
+                  </div>
                 </div>
               );
             })}
